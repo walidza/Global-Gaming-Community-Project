@@ -10,7 +10,7 @@ It is programmed in a game called mta sa, which is an online game adapted from G
   - account system
 
 
-### Plugins
+### Functions
 
 | functions | README |
 | ------ | ------ |
