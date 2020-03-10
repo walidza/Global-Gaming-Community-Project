@@ -1,0 +1,31 @@
+<meta>
+  <info author="WalidZa" name="account" version="1.0.0" type="script" description="Island RolePlay account system"/>/>
+
+
+<!--login Fils-->
+
+	<script src="login-panel/panelC.lua" type="client"/>
+	<script src="login-panel/panelS.lua" type="server"/>
+
+<!--App Fils-->
+	<script src="application/panelC.lua" type="client"/>
+	<script src="application/panelS.lua" type="server" />
+
+	<!--login Fils/fils-->
+	<file src="login-panel/fils/music/parasyte.mp3"/>
+
+
+	<file src="login-panel/fils/fonts/OswaldBold.ttf" />
+	<file src="login-panel/fils/fonts/openSans.ttf" />
+	<file src="login-panel/fils/fonts/Kalam.ttf" />
+
+
+	<file src="login-panel/fils/png/profile.png" />
+	
+
+
+
+	<oop>true</oop>
+
+
+</meta>
