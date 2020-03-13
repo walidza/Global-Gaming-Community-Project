@@ -14,5 +14,4 @@ It is programmed in a game called mta sa, which is an online game adapted from G
 
 | functions | README |
 | ------ | ------ |
-| infoLogMsg | string("text"),code(error,good) |
-| infoReMsg | string("text"),code(error,good) |
+|  |
