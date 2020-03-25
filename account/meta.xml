@@ -1,31 +1,25 @@
 <meta>
-  <info author="WalidZa" name="account" version="1.0.0" type="script" description="Island RolePlay account system"/>/>
 
 
-<!--login Fils-->
-
-	<script src="login-panel/panelC.lua" type="client"/>
-	<script src="login-panel/panelS.lua" type="server"/>
-
-<!--App Fils-->
-	<script src="application/panelC.lua" type="client"/>
-	<script src="application/panelS.lua" type="server" />
-
-	<!--login Fils/fils-->
-	<file src="login-panel/fils/music/parasyte.mp3"/>
-
-
-	<file src="login-panel/fils/fonts/OswaldBold.ttf" />
-	<file src="login-panel/fils/fonts/openSans.ttf" />
-	<file src="login-panel/fils/fonts/Kalam.ttf" />
-
-
-	<file src="login-panel/fils/png/profile.png" />
-	
-
-
-
-	<oop>true</oop>
-
-
+  <info author="WalidZa" name="account" version="1.0.0" type="script" description="RolePlay account system"/>
+  <script src="login-panel/panelC.lua" type="client"/>
+  <script src="login-panel/panelS.lua" type="server"/>
+  <script src="application/panelC.lua" type="client"/>
+  <script src="application/panelS.lua" type="server"/>
+  <script src="characters/s_character.lua" type="server"/>
+  <script src="characters/c_character.lua" type="client"/>
+  <file src="fils/fonts/OswaldBold.ttf"/>
+  <file src="fils/fonts/segoepr.ttf" />
+  <file src="fils/fonts/openSans.ttf"/>
+  <file src="fils/fonts/Kalam.ttf"/>
+  <file src="fils/img/logo.png"/>
+  <file src="fils/icons/exit.png"/>
+  <file src="fils/icons/pass.png"/>
+  <file src="fils/icons/register.png"/>
+  <file src="fils/icons/succeeded.png"/>
+  <file src="fils/icons/user.png"/>
+  <file src="fils/icons/eye.png"/>
+  <file src="fils/icons/eyec.png"/>
+  <file src="fils/icons/email.png"/>
+  <file src="fils/icons/back.png"/>
 </meta>

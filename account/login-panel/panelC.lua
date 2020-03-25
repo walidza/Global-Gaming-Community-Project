@@ -1,18 +1,26 @@
 
 --var
+
+
 loadstring(exports.dgs:dgsImportFunction())()
-local registerPanel = nil
-local rRt = dgsCreateRoundRect(16,tocolor(85,90,100,150))
-local loginPanel = nil
-local OswaldBold = dgsCreateFont( "login-panel/fils/fonts/OswaldBold.ttf", 9 )
-local fontText = dgsCreateFont("login-panel/fils/fonts/openSans.ttf", 11.65)
-local errorFont = dgsCreateFont("login-panel/fils/fonts/openSans.ttf", 8)
-local TextGUI = dgsCreateFont("login-panel/fils/fonts/openSans.ttf", 8)
-local fontTextLabel = dgsCreateFont("login-panel/fils/fonts/openSans.ttf", 10)
-local fontTab = dgsCreateFont("login-panel/fils/fonts/openSans.ttf", 11)
-local titleFont = dgsCreateFont("login-panel/fils/fonts/Kalam.ttf", 25)
-local OpenSans = dgsCreateFont("login-panel/fils/fonts/openSans.ttf")
-local imgJoin = "https://cdn.discordapp.com/attachments/540486415151005707/685496704245825537/256-512.png"
+local loginHighLightText = {"Exit","Succeeded","Register","Show Password","Hide Password","Username","Password"}
+local registerHighLightText = {"Exit","Succeeded","Back","Show Password","Hide Password","Username","Password", "Re Password","Email"}
+local sW,sH = dgsGetScreenSize()
+
+local isLogin = false
+local isRegister = false
+
+local defaultColor = tocolor(249,5,213)
+local changeColor = tocolor(0,0,0)
+local OswaldBold = dgsCreateFont( "fils/fonts/OswaldBold.ttf", 13 )
+local segoepr = dgsCreateFont( "fils/fonts/segoepr.ttf",13)
+local fontText = dgsCreateFont("fils/fonts/openSans.ttf", 11.65)
+local errorFont = dgsCreateFont("fils/fonts/openSans.ttf", 8)
+local TextGUI = dgsCreateFont("fils/fonts/openSans.ttf", 8)
+local fontTextLabel = dgsCreateFont("fils/fonts/openSans.ttf", 10)
+local fontTab = dgsCreateFont("fils/fonts/openSans.ttf", 11)
+local titleFont = dgsCreateFont("fils/fonts/Kalam.ttf", 25)
+local OpenSans = dgsCreateFont("fils/fonts/openSans.ttf")
 
 
 --[[/////////////////////////////////(Useful functions)////////////////////////////]]--
@@ -60,323 +68,569 @@ function smoothMoveCamera(x1,y1,z1,x1t,y1t,z1t,x2,y2,z2,x2t,y2t,z2t,time)
 end
 
 
+function isMouseInPosition ( x, y, width, height )
+	if ( not isCursorShowing( ) ) then
+		return false
+	end
+	local sx, sy = guiGetScreenSize ( )
+	local cx, cy = getCursorPosition ( )
+	local cx, cy = ( cx * sx ), ( cy * sy )
+	
+	return ( ( cx >= x and cx <= x + width ) and ( cy >= y and cy <= y + height ) )
+end
 
+--guiTable
+login = {}
+register = {}
+--login gui
 
---[[////////////////////////////////////(Login Gui)///////////////////////////////////]]--
-
-        loginPanel = dgsCreateWindow ( 409, 257, 308, 475, "login panel", false )
-        dgsWindowSetSizable(loginPanel, false)
-        dgsSetProperty(loginPanel,"titleHeight",0)
-
-        rndRect = dgsCreateRoundRect(60,tocolor(38, 130, 194,150))
-        titleRet = dgsCreateImage(0,3,50,50,rndRect,false,loginPanel)
-        titleText = dgsGetText(loginPanel)
-        title = dgsCreateLabel(45,10,308,24,titleText,false,loginPanel)
-        dgsSetFont(title,titleFont)
-
-        loginBnt = dgsCreateButton(54, 299, 206, 35, "Login", false, loginPanel)
-        registerBnt = dgsCreateButton(54, 344, 206, 35, "Register", false, loginPanel)
-        userEdit = dgsCreateEdit(71, 187, 206, 30, "", false, loginPanel)
-        passEdi = dgsCreateEdit(71, 227, 206, 30, "", false, loginPanel)
-        rememberChe = dgsCreateCheckBox(71, 267, 144, 15, "Remmeber me", true, false, loginPanel)
-        loginMsgInfo = dgsCreateLabel(0, 42, 308, 24, "loginMsgInfo", false, loginPanel)
-        dgsLabelSetHorizontalAlign(loginMsgInfo, "center", false)
-        dgsLabelSetVerticalAlign(loginMsgInfo, "center")
-        dgsLabelSetColor ( loginMsgInfo, 157, 11, 11 )
-        dgsSetFont(loginMsgInfo,errorFont)
-        lableINFO = dgsCreateLabel(60, 400, 195, 15, "Island Roleplay @ 2020", false, loginPanel)
-        dgsSetFont( lableINFO, fontTextLabel )
-        dgsLabelSetHorizontalAlign(lableINFO, "center", false)
-        dgsLabelSetVerticalAlign(lableINFO, "center")
-        lableINFO2 = dgsCreateLabel(60, 419, 195, 15, "Roleplay gamemode login panel", false, loginPanel)
-        dgsLabelSetHorizontalAlign(lableINFO2, "center", false)
-        dgsLabelSetVerticalAlign(lableINFO2, "center")
-        dgsSetFont( lableINFO2, fontTextLabel )
-        usernameLable = dgsCreateLabel(3, 188, 68, 29, "Username", false, loginPanel)
-        dgsLabelSetHorizontalAlign(usernameLable, "center", false)
-        dgsLabelSetVerticalAlign(usernameLable, "center")
-        dgsSetFont( usernameLable, fontTextLabel )
-        passwordLable = dgsCreateLabel(3, 227, 68, 29, "Password", false, loginPanel)
-        dgsLabelSetHorizontalAlign(passwordLable, "center", false)
-        dgsLabelSetVerticalAlign(passwordLable, "center")
-        dgsSetFont( passwordLable, fontTextLabel )
-
-        ---avatar setting
-        defProfile = dxCreateTexture("login-panel/fils/png/profile.png")    --default profile
-        local w,h = dxGetMaterialSize(defProfile)
-        profileMask = dgsCreateMask(defProfile,"circle")    --create mask for default profile
-        dgsMaskCenterTexturePosition(profileMask,w,h)
-        dgsMaskAdaptTextureSize(profileMask,w,h)
-        playerProfile = dgsCreateRemoteImage()    -- for player's profile
-        profile = dgsCreateImage(85, 60, 130, 130, profileMask,false,loginPanel)
-        addEventHandler("onDgsRemoteImageLoad",playerProfile,function()
-            dgsMaskSetTexture(profileMask,dgsRemoteImageGetTexture(source))
-        end,false)
+        login.panel = dgsCreateLabel(sW*(0.4221428571428571),sH*(0.1152380952380952), sW*(0.2007142857142857), sH*(0.5923809523809524), "", false)
+        login.registerIcon = dgsCreateImage(sW*(0.0071428571428571), sH*(0.5380952380952381), sW*(0.0342857142857143), sH*(0.0447619047619048), "fils/icons/register.png", false, login.panel)
+        login.succeededIcon = dgsCreateImage(sW*(0.0828571428571429), sH*(0.5380952380952381), sW*(0.0342857142857143), sH*(0.0447619047619048), "fils/icons/succeeded.png", false, login.panel)
+        login.exitIcon = dgsCreateImage(sW*(0.155), sH*(0.5380952380952381), sW*(0.0342857142857143), sH*(0.0447619047619048), "fils/icons/exit.png", false, login.panel)
+        login.logo = dgsCreateImage(sW*(0), sH*(0), sW*(0.25), sH*(0.2142857142857143), "fils/img/logo.png", false, login.panel)
+        rndRect = dgsCreateRoundRect(1.5,tocolor(0,0,0,150))
+        login.blurEditUser = dgsCreateImage(sW*(0.0071428571428571), sH*(0.2095238095238095), sW*(0.1857142857142857), sH*(0.0428571428571429), rndRect, false, login.panel)
+        login.blurEditPass = dgsCreateImage(sW*(0.0071428571428571), sH*(0.2571428571428571), sW*(0.1857142857142857), sH*(0.0428571428571429), rndRect, false, login.panel)
+        login.userEdit = dgsCreateEdit(sW*(0.0428571428571429), sH*(0.0057142857142857), sW*(0.1378571428571429), sH*(0.0314285714285714), "", false, login.blurEditUser)
+        login.passEdit = dgsCreateEdit(sW*(0.0428571428571429), sH*(0.0066666666666667), sW*(0.1378571428571429), sH*(0.0314285714285714), "", false, login.blurEditPass)
+        login.userImg = dgsCreateImage(sW*(0.0071428571428571), sH*(0), sW*(0.0314285714285714), sH*(0.0447619047619048), "fils/icons/user.png", false, login.blurEditUser)
+        login.passImg = dgsCreateImage(sW*(0.0071428571428571), sH*(0), sW*(0.0307142857142857), sH*(0.0428571428571429), "fils/icons/pass.png", false, login.blurEditPass)
+        login.passShowIcon = dgsCreateImage(sW*(0.1642857142857143), sH*(0.2952380952380952), sW*(0.025), sH*(0.0333333333333333), "fils/icons/eye.png", false, login.panel)
+        login.blurIcon = dgsCreateImage(sW*(0.0042857142857143), sH*(0.5380952380952381), sW*(0.1857142857142857), sH*(0.0428571428571429), rndRect, false, login.panel)
         
+        login.infoMsg = dgsCreateLabel(sW*(0),sH*(0.4285714285714286),sW*(0.2),sH*(0.0095238095238095), "Your account Name is take damege!", false, login.panel,tocolor(250,20,20))
+        dgsLabelSetHorizontalAlign(login.infoMsg,"center")
+        dgsSetFont(login.infoMsg,"aril-bold")
+        dgsLabelSetVerticalAlign(login.infoMsg,"center")
+        dgsMoveToBack (login.blurIcon)
+        dgsMoveToBack (login.blurEditUser)
 
+        blurbox = dgsCreateBlurBox()
+        dxSetShaderValue(blurbox,"brightness",2)
 
-        dgsSetText( loginMsgInfo, "" )
+        --Property login
+                dgsSetProperty(login.blurEditUser,"functions",[[
+                        local arguments = {...}
+                        local blurbox = arguments[1]
+                        local renderArguments = renderArguments
+                        local x,y,w,h = renderArguments[1],renderArguments[2],renderArguments[3],renderArguments[4]
+                        dgsBlurBoxRender(blurbox,x-sW*(0.0010714285714286),y-sH*(1/1050),w,h)
+                ]],blurbox)
+                dgsSetProperty(login.blurEditPass,"functions",[[
+                        local arguments = {...}
+                        local blurbox = arguments[1]
+                        local renderArguments = renderArguments
+                        local x,y,w,h = renderArguments[1],renderArguments[2],renderArguments[3],renderArguments[4]
+                        dgsBlurBoxRender(blurbox,x-sW*(0.0010714285714286),y-sH*(1/1050),w,h)
+                ]],blurbox)
+                dgsSetProperty(login.blurIcon,"functions",[[
+                        local arguments = {...}
+                        local blurbox = arguments[1]
+                        local renderArguments = renderArguments
+                        local x,y,w,h = renderArguments[1],renderArguments[2],renderArguments[3],renderArguments[4]
+                        dgsBlurBoxRender(blurbox,x-sW*(0.0010714285714286),y,w,h)
+                ]],blurbox)
+                local tableMasked = {login.passEdit}
+                local tableBgColor = {login.userEdit,login.passEdit}
+                local tableFont = {login.userEdit}
 
-
---[[////////////////////////////////////(Register Gui)///////////////////////////////////]]--
-
-        registerPanel = dgsCreateWindow(341, 143, 706, 190, "Register Panel", false)
-        dgsWindowSetSizable(registerPanel, false)
-        dgsSetProperty(registerPanel,"titleHeight",0)
-
-        titleRet = dgsCreateImage(0,3,50,50,rndRect,false,registerPanel)
-        titleText = dgsGetText(registerPanel)
-        title = dgsCreateLabel(45,10,308,24,titleText,false,registerPanel)
-        dgsSetFont(title,titleFont)
-        eY = 25
-        backBnt = dgsCreateButton(562, 93+eY, 131, 35, "Back", false, registerPanel)
-        regUserEdit = dgsCreateEdit(77, 37+eY, 199, 30, "", false, registerPanel)
-        registerSeccBnt = dgsCreateButton(562, 33+eY, 131, 35, "register", false, registerPanel)
-        regUsername = dgsCreateLabel(10, 44+eY, 67, 26, "Username", false, registerPanel)
-        dgsSetFont(regUsername, fontTextLabel)
-        dgsLabelSetVerticalAlign(regUsername, "center")
-        regPassword = dgsCreateLabel(10, 90+eY, 67, 26, "Password", false, registerPanel)
-        dgsSetFont(regPassword, fontTextLabel)
-        dgsLabelSetVerticalAlign(regPassword, "center")
-        regRePqssword = dgsCreateLabel(276, 90+eY, 67, 26, "Re Password", false, registerPanel)
-        dgsSetFont(regRePqssword, fontTextLabel)
-        dgsLabelSetVerticalAlign(regRePqssword, "center")
-        regPassEdit = dgsCreateEdit(77, 83+eY, 199, 30, "", false, registerPanel)
-        regRePassEdit = dgsCreateEdit(353, 83+eY, 199, 30, "", false, registerPanel)
-        regEmail = dgsCreateLabel(280, 44+eY, 67, 26, "Email", false, registerPanel)
-        dgsSetFont(regEmail, fontTextLabel)
-        dgsLabelSetVerticalAlign(regEmail, "center")
-        regEmailEdit = dgsCreateEdit(353, 37+eY, 199, 30, "", false, registerPanel)
-        regAcceptCheck = dgsCreateCheckBox(48, 138+eY, 228, 16, "accept server rules", false, false, registerPanel)
-        dgsSetFont(regAcceptCheck, fontTextLabel)
-        dgsSetProperty(regAcceptCheck, "NormalTextColour", "FF00A1FE")   
-        registerMsgInfo = dgsCreateLabel(198, 19+eY, 323, 15, "registerMsgInfo", false, registerPanel)
-        dgsLabelSetHorizontalAlign(registerMsgInfo, "center", false)
-        dgsLabelSetVerticalAlign(registerMsgInfo, "center")
-        dgsLabelSetColor ( registerMsgInfo, 157, 11, 11 )  
-        dgsSetText( registerMsgInfo, "" )
-        dgsSetFont(registerMsgInfo,errorFont)
-
-        avatarEdit = dgsCreateEdit(335, 127+eY, 212, 30, "", false,registerPanel)
-        regAvatar = dgsCreateLabel(235, 135+eY, 100, 16, "Avatar URL .png", false, registerPanel) 
-
-
-        edit = {passEdi,userEdit,regPassEdit,regEmailEdit,avatarEdit,regRePassEdit,regUserEdit}
-
-        dgsSetVisible( registerPanel, false )
-
-
-        --------------
-        ---Property---
-        --------------
-
-        dgsSetProperty(edit,"padding",{9,0})
-
-        --login edit
-        dgsSetProperty(passEdi,"bgImage",rRt)
-        dgsSetProperty(userEdit,"bgImage",rRt)
-        --login bnt 
-        dgsSetProperty(registerBnt,"image",{rRt,rRt,rRt})
-        dgsSetProperty(loginBnt,"image",{rRt,rRt,rRt})
-
-        --register edit 
-        dgsSetProperty(regPassEdit,"bgImage",rRt)
-        dgsSetProperty(regEmailEdit,"bgImage",rRt)
-        dgsSetProperty(avatarEdit,"bgImage",rRt)
-        dgsSetProperty(regRePassEdit,"bgImage",rRt)
-        dgsSetProperty(regUserEdit,"bgImage",rRt)
-
-
-        --register bnt 
-        dgsSetProperty(backBnt,"image",{rRt,rRt,rRt})
-        dgsSetProperty(registerSeccBnt,"image",{rRt,rRt,rRt})
-
-
---[[////////////////////////////////////(Login Config)///////////////////////////////////]]--
-
-function infoLogMsg (text, code) -- if you want send info to login panel use this function
-	if code == "error" then
-		dgsSetText (loginMsgInfo,text)
-                dgsLabelSetColor( loginMsgInfo,157, 11, 11 )
-        else
-                if code == "good" then
-                        dgsSetText (loginMsgInfo,text)
-                        dgsLabelSetColor( loginMsgInfo,16, 193, 46 )
-                end
-	end
-
-
-end
-addEvent("infoLoginMsg",true)
-addEventHandler( "infoLoginMsg", getRootElement(), infoLogMsg )
+                dgsSetProperty(tableMasked,"masked",true)
+                dgsSetProperty(tableBgColor,"bgColor",0)
+                dgsSetProperty(tableFont,"font",fontText)
+                dgsSetVisible(login.panel,false)
 
 
 
-function infoReMsg (text, code) -- if you want send info to register panel use this function
-	if code == "error" then
-		dgsSetText (registerMsgInfo,text)
-                dgsLabelSetColor( registerMsgInfo,157,11,11 )
-        else
-                if code =="good" then 
-                        dgsSetText(registerMsgInfo,text)
-                        dgsLabelSetColor(registerMsgInfo,16, 193, 46)
-                end
-	end
-end
-addEvent("infoRegisterMsg",true)
-addEventHandler( "infoRegisterMsg", getRootElement(), infoReMsg )
 
-function onJoin( ) --On player is join allow to show login panel
+--register gui
 
-                dgsSetVisible( loginPanel , true )
-                loginSound = playSound( "login-panel/fils/music/parasyte.mp3")
-                smoothMoveCamera(131.16368103027, -1786.4763183594, 39.825199127197, 160.28018188477, -1880.9406738281, 24.701948165894,131.16368103027, -1600.4763183594, 39.825199127197, 160.28018188477, -1880.9406738281, 24.701948165894,20000)
-                fadeCamera(true)
-                showCursor(true)
-                dgsWindowSetCloseButtonEnabled(loginPanel, false)
+        register.panel = dgsCreateLabel(sW*(0.4221428571428571),sH*(0.1152380952380952), sW*(0.2007142857142857), sH*(0.5923809523809524), "", false)
+
+        register.logo = dgsCreateImage(sW*(0), sH*(0), sW*(0.25), sH*(0.2142857142857143), "fils/img/logo.png", false, register.panel)
+        register.backIcon = dgsCreateImage(sW*(0.0071428571428571), sH*(0.5380952380952381), sW*(0.0342857142857143), sH*(0.0447619047619048), "fils/icons/back.png", false, register.panel)
+        register.succeededIcon = dgsCreateImage(sW*(0.0828571428571429), sH*(0.5380952380952381), sW*(0.0342857142857143), sH*(0.0447619047619048), "fils/icons/succeeded.png", false, register.panel)
+        register.exitIcon = dgsCreateImage(sW*(0.155), sH*(0.5380952380952381), sW*(0.0342857142857143), sH*(0.0447619047619048), "fils/icons/exit.png", false, register.panel)
+        register.passShowIcon = dgsCreateImage(sW*(0.1642857142857143), sH*(0.3904761904761905), sW*(0.025), sH*(0.0333333333333333), "fils/icons/eye.png", false, register.panel)
+
+        register.rndRect = dgsCreateRoundRect(1.5,tocolor(0,0,0,150))
+        
+        register.blurEditUser = dgsCreateImage(sW*(0.0071428571428571), sH*(0.2095238095238095), sW*(0.1857142857142857), sH*(0.0428571428571429), register.rndRect, false, register.panel)
+        register.blurEditPass = dgsCreateImage(sW*(0.0071428571428571), sH*(0.2571428571428571), sW*(0.1857142857142857), sH*(0.0428571428571429), register.rndRect, false, register.panel)
+        register.blurEditRePass = dgsCreateImage(sW*(0.0071428571428571), sH*(0.3047619047619048), sW*(0.1857142857142857), sH*(0.0428571428571429), register.rndRect, false,register.panel)
+        register.blurEditEmail = dgsCreateImage(sW*(0.0071428571428571), sH*(0.3523809523809524), sW*(0.1857142857142857), sH*(0.0428571428571429), register.rndRect, false,register.panel)
+        
+        register.userEdit = dgsCreateEdit(sW*(0.0428571428571429), sH*(0.0057142857142857), sW*(0.1378571428571429), sH*(0.0314285714285714), "", false, register.blurEditUser)
+        register.passEdit = dgsCreateEdit(sW*(0.0428571428571429), sH*(0.0066666666666667), sW*(0.1378571428571429), sH*(0.0314285714285714), "", false, register.blurEditPass)
+        register.rePassEdit = dgsCreateEdit(sW*(0.0428571428571429), sH*(0.0066666666666667), sW*(0.1378571428571429), sH*(0.0314285714285714),"",false, register.blurEditRePass)
+        register.emailEdit = dgsCreateEdit(sW*(0.0428571428571429), sH*(0.0066666666666667), sW*(0.1378571428571429), sH*(0.0314285714285714),"",false, register.blurEditEmail)
+        
+        register.userImg = dgsCreateImage(sW*(0.0071428571428571), sH*(0), sW*(0.0314285714285714), sH*(0.0447619047619048), "fils/icons/user.png", false, register.blurEditUser)
+        register.passImg = dgsCreateImage(sW*(0.0071428571428571), sH*(0), sW*(0.0307142857142857), sH*(0.0428571428571429), "fils/icons/pass.png", false, register.blurEditPass)
+        register.rePassImg = dgsCreateImage(sW*(0.0071428571428571), sH*(0), sW*(0.0307142857142857), sH*(0.0428571428571429), "fils/icons/pass.png", false, register.blurEditRePass)
+        register.emailImg = dgsCreateImage(sW*(0.0071428571428571), sH*(0), sW*(0.0314285714285714), sH*(0.0447619047619048), "fils/icons/email.png", false, register.blurEditEmail)
+        register.blurIcon = dgsCreateImage(sW*(0.0042857142857143), sH*(0.5380952380952381), sW*(0.1857142857142857), sH*(0.0428571428571429), register.rndRect, false, register.panel)
+        dgsMoveToBack (register.blurIcon)
+        dgsMoveToBack (register.blurEditUser)
+        register.blurbox = dgsCreateBlurBox()
+
+        register.infoMsg = dgsCreateLabel(sW*(0),sH*(0.4285714285714286),sW*(0.2),sH*(0.0095238095238095), "Your account Name is take damege!", false, register.panel,tocolor(250,20,20))
+        dgsLabelSetHorizontalAlign(register.infoMsg,"center")
+        dgsSetFont(register.infoMsg,"aril-bold")
+        dgsLabelSetVerticalAlign(register.infoMsg,"center")
+        dxSetShaderValue(register.blurbox,"brightness",2)
+        --Property register
+                dgsSetProperty(register.blurEditUser,"functions",[[
+                        local arguments = {...}
+                        local blurbox = arguments[1]
+                        local renderArguments = renderArguments
+                        local x,y,w,h = renderArguments[1],renderArguments[2],renderArguments[3],renderArguments[4]
+                        dgsBlurBoxRender(blurbox,x-sW*(0.0010714285714286),y-sH*(1/1050),w,h)
+                ]],blurbox)
+                dgsSetProperty(register.blurEditPass,"functions",[[
+                        local arguments = {...}
+                        local blurbox = arguments[1]
+                        local renderArguments = renderArguments
+                        local x,y,w,h = renderArguments[1],renderArguments[2],renderArguments[3],renderArguments[4]
+                        dgsBlurBoxRender(blurbox,x-sW*(0.0010714285714286),y-sH*(1/1050),w,h)
+                ]],blurbox)
+                dgsSetProperty(register.blurEditRePass,"functions",[[
+                        local arguments = {...}
+                        local blurbox = arguments[1]
+                        local renderArguments = renderArguments
+                        local x,y,w,h = renderArguments[1],renderArguments[2],renderArguments[3],renderArguments[4]
+                        dgsBlurBoxRender(blurbox,x-sW*(0.0010714285714286),y-sH*(1/1050),w,h)
+                ]],blurbox)
+                dgsSetProperty(register.blurEditEmail,"functions",[[
+                        local arguments = {...}
+                        local blurbox = arguments[1]
+                        local renderArguments = renderArguments
+                        local x,y,w,h = renderArguments[1],renderArguments[2],renderArguments[3],renderArguments[4]
+                        dgsBlurBoxRender(blurbox,x-sW*(0.0010714285714286),y-sH*(1/1050),w,h)
+                ]],blurbox)
+                dgsSetProperty(register.blurIcon,"functions",[[
+                        local arguments = {...}
+                        local blurbox = arguments[1]
+                        local renderArguments = renderArguments
+                        local x,y,w,h = renderArguments[1],renderArguments[2],renderArguments[3],renderArguments[4]
+                        dgsBlurBoxRender(blurbox,x-sW*(0.0010714285714286),y,w,h)
+                ]],blurbox)
+                local tableMasked = {register.passEdit,register.rePassEdit}
+                local tableBgColor = {register.userEdit,register.rePassEdit,register.passEdit,register.emailEdit}
+                local tableFont = {register.userEdit,register.emailEdit}
+                dgsSetProperty(tableMasked,"masked",true)
+                dgsSetProperty(tableBgColor,"bgColor",0)
+                dgsSetProperty(tableFont,"font",fontText)
+                dgsSetVisible (register.panel,false)
+
+
+
+-- login code
+dgsSetText (login.infoMsg,"")
+dgsSetText (register.infoMsg,"")
+
+
+addEventHandler("onClientResourceStart",getResourceRootElement(),
+function ()
+        isLoginIn = getElementData(localPlayer,"isPlayerLoggedIn")
+
+        if isLoginIn == false then
                 showChat(false)
+                showCursor(true)
+                smoothMoveCamera(1687.78515625,-2112.896484375,17.675107955933,1591.0621337891,-2113.8806152344,-7.6960048675537,1828.4173583984,-2111.80859375,23.825691223145,1730.4993896484,-2112.8049316406,3.5507338047028,50000)
+                fadeCamera(true) 
+                dgsSetVisible(login.panel,true)
+                isLogin = true
+        end
+end
+)
 
-                        toggleAllControls(false)
-                        setElementFrozen(localPlayer,true)
-                        setElementDimension(localPlayer,1)
-                        setElementPosition(localPlayer,0,0,0)
-        print(getElementPosition(localPlayer))
-               
-end       
-addEventHandler( "onClientResourceStart", resourceRoot, onJoin )
 
-
-function loginBntClick ( localPlayer ) --On player use login Button then start get config and send to server side
-        
-                if (source == loginBnt) then
-                        username = dgsGetText(userEdit)
-                        password = dgsGetText(passEdi)
-                        
-                        if (string.len(password) > 4 and string.len(username) > 1) then
-                                triggerServerEvent("loginSuccess", root, username, password)
-                        else
-                                infoLogMsg( "You need +4 chars in Password and +2 chars in Username","error")
+function infoMsg( panel, text, state)
+        if panel == "login" then
+                if isLogin == true then
+                        if state == "error" then
+                                dgsSetText(login.infoMsg,text)
+                                dgsLabelSetColor(login.infoMsg,255,0,0)
+                        end
+                        if state == "good" then
+                                dgsSetText(login.infoMsg,text)
+                                dgsLabelSetColor(login.infoMsg,0,255,0)
                         end
                 end
+        end
+        if panel == "register" then
+                if isRegister == true then
+                        if state == "error" then
+                                dgsSetText(register.infoMsg,text)
+                                dgsLabelSetColor(register.infoMsg,255,0,0)
+                        end
+                        if state == "good" then
+                                dgsSetText(register.infoMsg,text)
+                                dgsLabelSetColor(register.infoMsg,0,255,0)
+                        end
+                end
+        end
 end
-addEventHandler( "onDgsMouseClick", loginBnt, loginBntClick )
+addEvent("infoMsg",true)
+addEventHandler("infoMsg",root,infoMsg)
 
-addEventHandler("onClientRender", root, 
+addEventHandler("onDgsRender",root,
 function()
-        if isElement(loginPanel) and dgsGetVisible(loginPanel) then
-                Getusername = dgsGetText(userEdit)
-                triggerServerEvent("mysqlRender",root, Getusername)
-                avatarUrl = getElementData(localPlayer,"avatarUrl")
-                name = getElementData(localPlayer,"name")
-
-                if Getusername == name then 
-                        setElementData(localPlayer,"imgName",avatarUrl)
+        --login
+        if isLogin == true then
+                if isMouseInPosition (sW*(0.57857143878937),sH*(0.65809524059296), sW*(0.0342857142857143), sH*(0.04)) then --exit
+                        dgsSetProperty(login.exitIcon,"color",changeColor)
                 else
-                        local profileImg1 = "https://cdn.discordapp.com/attachments/540486415151005707/685496704245825537/256-512.png" 
-                        setElementData(localPlayer,"imgName",profileImg1)
+                        dgsSetProperty(login.exitIcon,"color",defaultColor)
+                end
+
+                if isMouseInPosition(sW*(0.50499999523163),sH*(0.65619045495987), sW*(0.0342857142857143), sH*(0.04)) then -- succeeded
+                        dgsSetProperty(login.succeededIcon,"color",changeColor)
+                else
+                        dgsSetProperty(login.succeededIcon,"color",defaultColor)
+                end
+
+                if isMouseInPosition(sW*(0.42642858624458),sH*(0.65619045495987), sW*(0.0342857142857143), sH*(0.04)) then --register
+                        dgsSetProperty(login.registerIcon,"color",changeColor)
+                else
+                        dgsSetProperty(login.registerIcon,"color",defaultColor)
+                end
+
+                if isMouseInPosition(sW*(0.58428573608398),sH*(0.41809523105621), sW*(0.0271428571428571), sH*(0.0238095238095238)) then --show pass
+                        dgsSetProperty(login.passShowIcon,"color",changeColor)
+                else
+                        dgsSetProperty(login.passShowIcon,"color",defaultColor)
+                end
+
+                if isMouseInPosition(sW*(0.43857142329216),sH*(0.37428572773933), sW*(0.1764285714285714), sH*(0.04)) then --pass
+                        dgsSetProperty(login.passImg,"color",changeColor)
+                else
+                        dgsSetProperty(login.passImg,"color",defaultColor)
+                end
+
+                if isMouseInPosition(sW*(0.43285715579987),sH*(0.32571429014206), sW*(0.1764285714285714), sH*(0.04)) then --user 
+                        dgsSetProperty(login.userImg,"color",changeColor)
+                else
+                        dgsSetProperty(login.userImg,"color",defaultColor)
                 end
         end
+        if isRegister == true then
+        --register
+                if isMouseInPosition (sW*(0.57857143878937),sH*(0.65809524059296), sW*(0.0342857142857143), sH*(0.04)) then --exit
+                        dgsSetProperty(register.exitIcon,"color",changeColor)
+                else
+                        dgsSetProperty(register.exitIcon,"color",defaultColor)
+                end
 
-end)
+                if isMouseInPosition(sW*(0.50499999523163),sH*(0.65619045495987), sW*(0.0342857142857143), sH*(0.04)) then -- succeeded
+                        dgsSetProperty(register.succeededIcon,"color",changeColor)
+                else
+                        dgsSetProperty(register.succeededIcon,"color",defaultColor)
+                end
 
-addEventHandler("onClientKey",root,
+                if isMouseInPosition(sW*(0.42642858624458),sH*(0.65619045495987), sW*(0.0342857142857143), sH*(0.04)) then --back
+                        dgsSetProperty(register.backIcon,"color",changeColor)
+                else
+                        dgsSetProperty(register.backIcon,"color",defaultColor)
+                end
+
+
+                if isMouseInPosition(sW*(0.43285715579987),sH*(0.32571429014206), sW*(0.1764285714285714), sH*(0.04)) then --user 
+                        dgsSetProperty(register.userImg,"color",changeColor)
+                else
+                        dgsSetProperty(register.userImg,"color",defaultColor)
+                end
+
+                if isMouseInPosition(sW*(0.43857142329216),sH*(0.37428572773933), sW*(0.1764285714285714), sH*(0.04)) then --pass
+                        dgsSetProperty(register.passImg,"color",changeColor)
+                else
+                        dgsSetProperty(register.passImg,"color",defaultColor)
+                end
+
+                if isMouseInPosition(sW*(0.41928571462631),sH*(0.42190477252007), sW*(0.1764285714285714), sH*(0.04)) then --re pass 
+                        dgsSetProperty(register.rePassImg,"color",changeColor)
+                else
+                        dgsSetProperty(register.rePassImg,"color",defaultColor)
+                end
+
+                if isMouseInPosition(sW*(0.4135714173317),sH*(0.4723809659481), sW*(0.1764285714285714), sH*(0.04)) then --email
+                        dgsSetProperty(register.emailImg,"color",changeColor)
+                else
+                        dgsSetProperty(register.emailImg,"color",defaultColor)
+                end
+
+                if isMouseInPosition(sW*(0.56357145309448),sH*(0.51523810625076), sW*(0.0271428571428571), sH*(0.0238095238095238)) then --show pass
+                        dgsSetProperty(register.passShowIcon,"color",changeColor)
+                else
+                        dgsSetProperty(register.passShowIcon,"color",defaultColor)
+                end
+        end
+        
+end
+)
+
+function infoInPutChack(state)
+        if state == "login" then
+                if isLogin == true then
+
+                end
+        end
+        if state == "register" then
+                if isRegister == true then
+                        local regUsernameGet = dgsGetText(register.userEdit)
+                        local regEmailGet = dgsGetText(register.emailEdit)
+                        local regPasswordGet = dgsGetText(register.passEdit)
+                        local regRePasswordGet = dgsGetText(register.rePassEdit)
+                                if not regUsernameGet or regUsernameGet == "" or not regPasswordGet or regPasswordGet == "" or not regRePasswordGet or regRePasswordGet == "" or not regEmailGet or regEmailGet == ""  then
+                                        infoMsg( "register", "Please fill out all the information", "error")
+                                elseif string.len(regUsernameGet)< 3 then
+                                        infoMsg( "register", "The name must be more than four characters long", "error")
+                                elseif string.len(regPasswordGet)< 6 then
+                                        infoMsg( "register", "Password must be more than six characters long", "error")
+                                elseif string.len(regUsernameGet)>= 15 then 
+                                        infoMsg( "register", "The name must be less than fourteen characters long", "error")
+                                elseif regPasswordGet ~= regRePasswordGet then
+                                        infoMsg( "register", "The password must match the password confirmation", "error")
+                                elseif string.match(regUsernameGet,"%W") then
+                                        infoMsg( "register", "\"!@#$\"%'^&*()\" are not allowed in username.", "error")	
+                                else
+                                        infoMsg( "register", "All your information is good !", "good")			
+                                end
+                end
+        end
+end
+addEvent("infoInPutChack",true)
+addEventHandler("infoInPutChack",root,infoInPutChack)
+
+addEventHandler("onClientClick",root,
+function( button, state)
+        if button == "left" and state == "down" then
+                if isLogin == true then
+
+                        dgsMoveToBack (login.blurIcon)
+                        dgsMoveToBack (login.blurEditUser)
+                        if isMouseInPosition(sW*(0.58428573608398),sH*(0.41809523105621), sW*(0.0271428571428571), sH*(0.0238095238095238)) then -- show pass
+                                if getElementData(login.passShowIcon,"passShowIcon") == "fils/icons/eyec.png" then
+                                        dgsImageSetImage(login.passShowIcon,"fils/icons/eye.png")
+                                        setElementData(login.passShowIcon,"passShowIcon",false)
+                                        dgsSetProperty(login.passEdit,"masked",true)
+                                else
+                                        dgsSetProperty(login.passEdit,"masked",false)
+                                        dgsImageSetImage(login.passShowIcon,"fils/icons/eyec.png")
+                                        setElementData(login.passShowIcon,"passShowIcon","fils/icons/eyec.png")
+                                end
+                        end
+                        if isMouseInPosition (sW*(0.57857143878937),sH*(0.65809524059296), sW*(0.0342857142857143), sH*(0.04)) then --exit
+                                triggerServerEvent("disconnectPlayer",source)
+                        end
+                        if isMouseInPosition(sW*(0.42642858624458),sH*(0.65619045495987), sW*(0.0342857142857143), sH*(0.04)) then -- register
+                                isRegister = true 
+                                isLogin = false
+                                dgsSetVisible (login.panel, false)
+                                dgsSetVisible (register.panel,true)
+                                saveHide = getElementData(login.passShowIcon,"passShowIcon")
+                        end
+                        if isMouseInPosition(sW*(0.50499999523163),sH*(0.65619045495987), sW*(0.0342857142857143), sH*(0.04)) then -- succeeded
+                                local username = dgsGetText(login.userEdit)
+                                local password = dgsGetText(login.passEdit)
+                                infoInPutChack("login")
+                                triggerServerEvent("loginPlayer", root, username, password)
+                        end
+                else
+        --register
+                        if isRegister == true then
+                                local regUsername = dgsGetText(register.userEdit)
+                                local regEmail = dgsGetText(register.emailEdit)
+                                local regPassword = dgsGetText(register.passEdit)
+                                dgsMoveToBack (register.blurIcon)
+                                dgsMoveToBack (register.blurEditUser)
+                                if isMouseInPosition(sW*(0.5864285826683),sH*(0.50952380895615), sW*(0.0271428571428571), sH*(0.0238095238095238)) then --show pass
+                                        if getElementData(register.passShowIcon,"passShowIcon") == "fils/icons/eyec.png" then
+                                                dgsImageSetImage(register.passShowIcon,"fils/icons/eye.png")
+                                                setElementData(register.passShowIcon,"passShowIcon",false)
+                                                dgsSetProperty(register.passEdit,"masked",true)
+                                                dgsSetProperty(register.rePassEdit,"masked",true)
+                                        else
+                                                dgsSetProperty(register.passEdit,"masked",false)
+                                                dgsSetProperty(register.rePassEdit,"masked",false)
+                                                dgsImageSetImage(register.passShowIcon,"fils/icons/eyec.png")
+                                                setElementData(register.passShowIcon,"passShowIcon","fils/icons/eyec.png")
+                                        end
+                                end
+                                if isMouseInPosition (sW*(0.57857143878937),sH*(0.65809524059296), sW*(0.0342857142857143), sH*(0.04)) then --exit
+                                        triggerServerEvent("disconnectPlayer",source)
+                                end
+                                if isMouseInPosition(sW*(0.42642858624458),sH*(0.65619045495987), sW*(0.0342857142857143), sH*(0.04)) then --back
+                                        isRegister = false
+                                        isLogin = true
+                                        dgsSetVisible (login.panel, true)
+                                        dgsSetVisible (register.panel,false)
+                                        saveHide = getElementData(register.passShowIcon,"passShowIcon")
+
+                                end
+                                if isMouseInPosition(sW*(0.50499999523163),sH*(0.65619045495987), sW*(0.0342857142857143), sH*(0.04)) then -- succeeded
+                                        infoInPutChack("register")
+                                        triggerServerEvent( "registerPlayer", root, regUsername, regPassword, regEmail)
+                                end
+                        end
+                end
+        end
+end
+)
+
+
+
+
+addEventHandler("onClientRender",root,
 function()
-        if isElement(loginPanel) and dgsGetVisible(loginPanel) then
-                local imageData = getElementData(localPlayer,"imgName")
-                if imageData then
-                    dgsRemoteImageRequest(playerProfile,imageData,true)
+        local screenx, screeny = getCursorPosition()
+        --login
+        if isLogin == true then
+                if isMouseInPosition (sW*(0.57857143878937),sH*(0.65809524059296), sW*(0.0342857142857143), sH*(0.04)) then --exit 
+                        local text = loginHighLightText[1]
+                        dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                        getTextWidth = dxGetTextWidth(text)
+                        getTextWidth = getTextWidth + 20
+                        dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
                 end
-                                
+                if isMouseInPosition(sW*(0.50499999523163),sH*(0.65619045495987), sW*(0.0342857142857143), sH*(0.04)) then -- succeeded
+                        local text = loginHighLightText[2]
+                        dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                        getTextWidth = dxGetTextWidth(text)
+                        getTextWidth = getTextWidth + 20
+                        dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
+                end
+                if isMouseInPosition(sW*(0.42642858624458),sH*(0.65619045495987), sW*(0.0342857142857143), sH*(0.04)) then -- register
+                        local text = loginHighLightText[3]
+                        dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                        getTextWidth = dxGetTextWidth(text)
+                        getTextWidth = getTextWidth + 20
+                        dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
+                end
+                if isMouseInPosition(sW*(0.58428573608398),sH*(0.41809523105621), sW*(0.0271428571428571), sH*(0.0238095238095238)) then -- show pass
+                        if getElementData(login.passShowIcon,"passShowIcon") == "fils/icons/eyec.png" then
+                                text = loginHighLightText[5]
+                        else
+                                text = loginHighLightText[4]
+                        end
+                        dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                        getTextWidth = dxGetTextWidth(text)
+                        getTextWidth = getTextWidth + 20
+                        dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
+                end
+                if isMouseInPosition(sW*(0.43285715579987),sH*(0.32571429014206), sW*(0.1764285714285714), sH*(0.04)) then --user 
+                        local text = loginHighLightText[6]
+                        dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                        getTextWidth = dxGetTextWidth(text)
+                        getTextWidth = getTextWidth + 20
+                        dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
+                end
+                if isMouseInPosition(sW*(0.43857142329216),sH*(0.37428572773933), sW*(0.1764285714285714), sH*(0.04)) then --pass edit
+                        local text = loginHighLightText[7]
+                        dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                        getTextWidth = dxGetTextWidth(text)
+                        getTextWidth = getTextWidth + 20
+                        dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
+                end
+        else
+                if isRegister == true then
+                        if isMouseInPosition (sW*(0.57857143878937),sH*(0.65809524059296), sW*(0.0342857142857143), sH*(0.04)) then --exit 
+                                local text = registerHighLightText[1]
+                                dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                                getTextWidth = dxGetTextWidth(text)
+                                getTextWidth = getTextWidth + 20
+                                dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
+                        end
+                        if isMouseInPosition(sW*(0.50499999523163),sH*(0.65619045495987), sW*(0.0342857142857143), sH*(0.04)) then -- succeeded
+                                local text = registerHighLightText[2]
+                                dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                                getTextWidth = dxGetTextWidth(text)
+                                getTextWidth = getTextWidth + 20
+                                dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
+                        end
+                        if isMouseInPosition(sW*(0.42642858624458),sH*(0.65619045495987), sW*(0.0342857142857143), sH*(0.04)) then -- back
+                                local text = registerHighLightText[3]
+                                dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                                getTextWidth = dxGetTextWidth(text)
+                                getTextWidth = getTextWidth + 20
+                                dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
+                        end
+                        if isMouseInPosition(sW*(0.56357145309448),sH*(0.51523810625076), sW*(0.0271428571428571), sH*(0.0238095238095238)) then --show pass
+                                if getElementData(login.passShowIcon,"passShowIcon") == "fils/icons/eyec.png" then
+                                        text = registerHighLightText[5]
+                                else
+                                        text = registerHighLightText[4]
+                                end                                dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                                getTextWidth = dxGetTextWidth(text)
+                                getTextWidth = getTextWidth + 20
+                                dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
+                        end
+                        if isMouseInPosition(sW*(0.43285715579987),sH*(0.32571429014206), sW*(0.1764285714285714), sH*(0.04)) then --user 
+                                local text = registerHighLightText[6]
+                                dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                                getTextWidth = dxGetTextWidth(text)
+                                getTextWidth = getTextWidth + 20
+                                dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
+                        end
+                        if isMouseInPosition(sW*(0.43857142329216),sH*(0.37428572773933), sW*(0.1764285714285714), sH*(0.04)) then --pass edit
+                                local text = registerHighLightText[7]
+                                dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                                getTextWidth = dxGetTextWidth(text)
+                                getTextWidth = getTextWidth + 20
+                                dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
+                        end
+                        if isMouseInPosition(sW*(0.41285714507103),sH*(0.42285713553429), sW*(0.1764285714285714), sH*(0.04)) then --re pass edit
+                                local text = registerHighLightText[8]
+                                dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                                getTextWidth = dxGetTextWidth(text)
+                                getTextWidth = getTextWidth + 20
+                                dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
+                        end
+                        if isMouseInPosition(sW*(0.4135714173317),sH*(0.4695238173008), sW*(0.1764285714285714), sH*(0.04)) then --email edit
+                                local text = registerHighLightText[9]
+                                dxDrawText( text, sW*screenx+10, sH*screeny-15, 20, 20, tocolor(255,255,255),1,"default-bold",alignX,alignY,clip,wordBreak,true)
+                                getTextWidth = dxGetTextWidth(text)
+                                getTextWidth = getTextWidth + 20
+                                dxDrawRectangle ( sW*screenx, sH*screeny-15, getTextWidth, 15, tocolor ( 0, 0, 0, 150 ) )
+                        end
+                end
         end
-end)
+        --register
+
+end
+)
+
+
 
 function successfullLogin() --On player has login then clear any login or register config or panel form the player screen
         if getElementData(localPlayer,"isPlayerLoggedIn") == true then
-                
+                isLogin = false
+                isRegister = false
                 local freeze = isElementFrozen ( localPlayer )
                 fadeCamera( true, 1,255, 0, 0)
-                dgsSetVisible( loginPanel , false )
+                dgsSetVisible(login.panel,false)
                 setCameraTarget(source, source)
                 showCursor(false)
                 removeCamHandler()
-                stopSound(loginSound)
                 showChat(true)
                 if freeze == true then
                         setElementFrozen(localPlayer,false)
                         toggleAllControls(true)
                         setElementDimension(localPlayer,0)
-                        print(getElementPosition(localPlayer))
                 end
         end
 
 end
+function registerSuccess(  ) -- On player complet register account then send him to login panel
+        isLogin = true
+        isRegister = false
+        dgsSetVisible(login.panel,true)
+        dgsSetVisible(register.panel,false)
+
+end
+
+addEvent("register.success",true)
 addEvent("login.success",true)
 addEventHandler( "login.success", localPlayer, successfullLogin)
-
-
---[[////////////////////////////////////(Register Config)///////////////////////////////////]]--
-function registerBntClick(  ) -- On player use register button then show register panel
-        if (source == registerBnt) then
-                dgsWindowSetCloseButtonEnabled(registerPanel,false)
-		dgsSetVisible( registerPanel, true )
-                dgsSetVisible( loginPanel, false )
-	end
-end
-addEventHandler( "onDgsMouseClick", registerBnt, registerBntClick)
-
-function registerPanelBntClick(  ) -- On the player, use the registration panel to create an account, take some security preparations, and send the configuration to the server side
-		if (source == registerSeccBnt) then
-			regUsernameGet = dgsGetText(regUserEdit)
-			regEmailGet = dgsGetText(regEmailEdit)
-			regPasswordGet = dgsGetText(regPassEdit)
-			regAcceptCheckBox = dgsCheckBoxGetSelected(regAcceptCheck)
-                        regRePasswordGet = dgsGetText(regRePassEdit)
-				if not regUsernameGet or regUsernameGet == "" or not regPasswordGet or regPasswordGet == "" or not regRePasswordGet or regRePasswordGet == "" or not regEmailGet or regEmailGet == ""  then
-					infoReMsg("Please fill out all the information","error")
-				elseif string.len(regUsernameGet)< 3 then
-					infoReMsg("The name must be more than four characters long","error")
-				elseif string.len(regPasswordGet)< 6 then
-					infoReMsg("Password must be more than six characters long","error")
-				elseif string.len(regUsernameGet)>= 15 then 
-					infoReMsg("The name must be less than fourteen characters long","error")
-				elseif regPasswordGet ~= regRePasswordGet then
-					infoReMsg("The password must match the password confirmation","error")
-				elseif string.match(regUsernameGet,"%W") then
-					infoReMsg("\"!@#$\"%'^&*()\" are not allowed in username.","error")				
-                                end
-                                
---[[/////////////////////////////////(Avatar system)/////////////////////////////////]]--
-
-                                avatarGet = dgsGetText(avatarEdit)
-
-                                
-
-                                if (regPasswordGet) == (regRePasswordGet) then
-					triggerServerEvent( "registerPlayer", root, regAcceptCheckBox, regUsernameGet, regRePasswordGet ,regPasswordGet, regEmailGet,avatarGet)
-				end
-
-		end
-	end
-addEventHandler( "onDgsMouseClick", registerSeccBnt, registerPanelBntClick)
-
-
-
-function backBntClick(  ) -- On player use back Button then clear register panel and show login panel
-        if (source == backBnt) then
-                dgsWindowSetCloseButtonEnabled(loginPanel, false)
-		dgsSetVisible( loginPanel, true )
-                dgsSetVisible( registerPanel, false )
-	end
-end
-addEventHandler( "onDgsMouseClick", backBnt, backBntClick )
-
-function registerSuccess(  ) -- On player complet register account then send him to login panel
-	dgsSetVisible( loginPanel, true )
-        dgsSetVisible( registerPanel, false )
-
-end
-addEvent ("register.success", true)
 addEventHandler ("register.success",localPlayer,registerSuccess)
-
---[[/////////////////////////////////(Avatar Config)/////////////////////////////////]]--
-
