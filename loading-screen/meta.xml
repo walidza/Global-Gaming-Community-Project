@@ -1,0 +1,17 @@
+<meta>
+	<info author="iwalidza" type="script" name="loading-screen" />
+	<script src="c_loading-screen.lua" type="client" cache="false" />
+	<script src="s_loading-screen.lua" type="server" />
+
+	<file src="img/loading.png" />
+	<file src="img/circle.png" />
+	<file src="img/characters/girl1.png" />
+	<file src="img/characters/girl2.png" />
+	<file src="img/characters/boy1.png" />
+	<file src="img/characters/boy2.png" />
+
+	<!--temp-->
+
+
+    <download_priority_group>1</download_priority_group>
+</meta>
