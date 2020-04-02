@@ -1,0 +1,8 @@
+<meta>
+	<info author="iwalidza" type="script" name="mysql" />
+	<script src="s_mysql.lua" type="server" />
+
+	<export function="singleQuery" type="server" />
+	<export function="execute" type="server" />
+
+</meta>
