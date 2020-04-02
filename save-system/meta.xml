@@ -1,0 +1,8 @@
+<meta>
+	<info author="walidza" type="script" name="save-system" />
+	<script src="c_id-save.lua" type="client" cache="false" />
+	<script src="s_id-save.lua" type="server" />
+
+	<export function="getPlayerID" type="client" />
+	<export function="getPlayerID" type="server" />
+</meta>
