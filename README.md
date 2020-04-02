@@ -13,13 +13,14 @@ It is programmed in a game called mta sa, which is an online game adapted from G
 
 ### Functions
 
-| functions | arguments | README |
-| --------- | --------- | ------------------- |
-|  getPlayerid|thePlayer|you can get player id|
+| resource | functions | arguments | README |
+| --------- | --------- | --------- | ------------------- |
+| save-system|getPlayerid|thePlayer|you can get player id|
 
 
 ### Elements
 
-| Elements | arguments | README |
-| -------- | --------- | ------ |
-|  id|thePlayer|you can get player id|
+| resource | Elements | arguments | README |
+| --------- | -------- | --------- | ------ |
+| save-system|  id|thePlayer|you can get player id|
+| account | playerName |thePlayer| you can get playername
