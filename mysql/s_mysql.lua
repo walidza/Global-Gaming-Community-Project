@@ -1,6 +1,6 @@
 addEventHandler("onResourceStart",root,
 function ()
-    DBConnection = dbConnect( "mysql", "dbname=rp;host=127.0.0.1;charset=utf8", "root", "iwalidzazarrouki" )
+    DBConnection = dbConnect( "mysql", "dbname=databesename;host=127.0.0.1;charset=utf8", "username", "pass" )
 end
 )
 
