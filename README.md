@@ -16,6 +16,8 @@ It is programmed in a game called mta sa, which is an online game adapted from G
 | resource | functions | arguments | README |
 | --------- | --------- | --------- | ------------------- |
 | save-system|getPlayerid|thePlayer|you can get player id|
+| mysql|singleQuery|dbString|you can send a simpel query to database with out dbConnect()|
+| mysql|execute|dbString|you can send a simpel execute to database with out dbConnect()|
 
 
 ### Elements
