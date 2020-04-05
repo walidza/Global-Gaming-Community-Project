@@ -10,21 +10,20 @@ It is programmed in a game called mta sa, which is an online game adapted from G
   - account system
   - save system
   - mysql
-  - loading screen
 
 
 ### Functions
 
-| resource | functions | arguments | README |
-| --------- | --------- | --------- | ------------------- |
-| save-system|getPlayerid|thePlayer|you can get player id|
-| mysql|singleQuery|dbString|you can send a simpel query to database with out dbConnect()|
-| mysql|execute|dbString|you can send a simpel execute to database with out dbConnect()|
+| Resource | Functions | Arguments | README | Side |
+| --------- | --------- | --------- | ------------------- |------------------- |
+| save-system | getPlayerid | thePlayer | You can get player id | Shared |
+| mysql | singleQuery | dbString | you can send a simpel query to database with out dbConnect() | Server |
+| mysql | execute | dbString | you can send a simpel execute to database with out dbConnect() | server |
 
 
 ### Elements
 
 | resource | Elements | arguments | README |
 | --------- | -------- | --------- | ------ |
-| save-system|  id|thePlayer|you can get player id|
+| save-system| id|thePlayer|you can get player id|
 | account | playerName |thePlayer| you can get playername
