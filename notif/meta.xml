@@ -1,0 +1,9 @@
+<meta>
+	<info author="iwalidza" type="script" name="notif" />
+	<script src="c_notif.lua" type="client" cache="false" />
+	<export function="drawNotif" type="client" />
+
+	<file src="png/error.png" />
+	<file src="png/info.png" />
+	<file src="png/scc.png" />
+</meta>
