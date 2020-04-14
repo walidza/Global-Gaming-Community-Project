@@ -1,4 +1,4 @@
-# Island Roleplay
+# Astronaut Roleplay
 
 
 Game type: role-playing is a unique type of game designed from nothing in which players are biased to quote an imagined character or represent the life of a real player
